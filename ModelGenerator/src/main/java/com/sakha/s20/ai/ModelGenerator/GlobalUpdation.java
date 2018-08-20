@@ -11,22 +11,22 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+//import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class GlobalUpdation {
 
 	@SuppressWarnings("unchecked")
 	public static Map<String, Object> GlobalUpdator(Map<String, Object> globalMap, Map<String, Object> localMap) {
-		ObjectMapper mapper = new ObjectMapper();
+//		ObjectMapper mapper = new ObjectMapper();
 
 		Set<String> intersect = new HashSet<String>(globalMap.keySet());
 		intersect.retainAll(localMap.keySet());
@@ -87,8 +87,7 @@ public class GlobalUpdation {
 					double Probability = (tempLocalProbability * globalTotal) / total;
 					globalWordMap.put(localKey, Probability);
 				}
-
-				globalDictMap.put("Total", (localTotal + globalTotal));
+				globalDictMap.replace("Total", (localTotal + globalTotal));
 			}
 			LinkedHashMap<String, Double> wordDict = (LinkedHashMap<String, Double>) globalDictMap.get("Words");
 			if (wordDict.containsKey(Word)) {
@@ -125,17 +124,19 @@ public class GlobalUpdation {
 //		ObjectMapper mapper = new ObjectMapper();
 //		Map<String, Object> globalMap = new HashMap<String, Object>();
 //		Map<String, Object> localMap = new HashMap<String, Object>();
-//		String jsonFilePath = "/home/anup/SakhaGlobal/S20/global/";
-//
+//		String jsonFilePath = "/home/anup/Desktop/";
+//		long startTime = System.nanoTime();  
 //		try {
 //			globalMap = mapper.readValue(new File(jsonFilePath + "Model1.json"),
 //					new TypeReference<Map<String, Object>>() {
 //					});
 //			System.out.println("GLOBAL: " + globalMap);
-////			localMap = mapper.readValue(new File(jsonFilePath + "Model2.json"),
-////					new TypeReference<Map<String, Object>>() {
-////					});
-//			mapper.writeValue(new File(jsonFilePath + "Model3.json"), GlobalUpdator(globalMap, localMap));
+//			localMap = mapper.readValue(new File(jsonFilePath + "Model2.json"),
+//					new TypeReference<Map<String, Object>>() {
+//					});
+//			mapper.writeValue(new File(jsonFilePath + "Model1.json"), GlobalUpdator(globalMap, localMap));
+//			long endTime = System.nanoTime();
+//			System.out.println("Took "+(endTime - startTime) + " ns");
 //		} catch (JsonParseException e) {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();

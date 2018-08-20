@@ -1,7 +1,5 @@
 package com.sakha.s20.ai.ModelGenerator;
 
-
-
 import static java.util.stream.Collectors.toMap;
 
 import java.io.BufferedReader;
@@ -22,6 +20,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import opennlp.tools.ngram.NGramModel;
+import opennlp.tools.tokenize.WhitespaceTokenizer;
+import opennlp.tools.util.StringList;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -29,38 +30,29 @@ import java.util.LinkedHashSet;
 
 public class ModelGenerator {
 	static Map<String, Object> final_dict = new HashMap<String, Object>();
-	
 
-	public static Map<String, List<String>> trigram_model(List<String[]> CORPUS_list) {
+	public static Map<String, List<String>> trigram_model(List<String> CORPUS_list) {
 		Map<String, List<String>> Dictionary = new DefaultDict<String, List<String>>(ArrayList.class);
-		for (String[] sentence : CORPUS_list) {
-			String previous_word_1 = "";
-			String previous_word_2 = "";
-			int j = 0, k = -1;
-			for (int i = 0; i < sentence.length - 1; i++) {
-				if (previous_word_1 != "" && previous_word_2 != "") {
-
-					Dictionary.get(previous_word_2 + " " + previous_word_1).add(sentence[i + 1]);
-				}
-				j++;
-				k++;
-				previous_word_1 = sentence[j];
-				previous_word_2 = sentence[k];
+		for (String sentence : CORPUS_list) {
+			StringList tokens = new StringList(WhitespaceTokenizer.INSTANCE.tokenize(sentence));
+			NGramModel nGramModel = new NGramModel();
+			nGramModel.add(tokens, 3, 3);
+			for (StringList ngram : nGramModel) {
+				Dictionary.get(ngram.getToken(0) + " " + ngram.getToken(1)).add(ngram.getToken(2));
 			}
 		}
 		return Dictionary;
 	}
 
-	public static Map<String, List<String>> bigram_model(List<String[]> CORPUS_list) {
+	public static Map<String, List<String>> bigram_model(ArrayList<String> arr) {
 		Map<String, List<String>> Dictionary = new DefaultDict<String, List<String>>(ArrayList.class);
-
-		for (String[] sentence : CORPUS_list) {
-			String previous_word = "";
-			for (String currentword : sentence) {
-				if (previous_word != "") {
-					Dictionary.get(previous_word).add(currentword);
-				}
-				previous_word = currentword;
+		for (String sentence : arr) {
+			System.out.println(sentence);
+			StringList tokens = new StringList(WhitespaceTokenizer.INSTANCE.tokenize(sentence));
+			NGramModel nGramModel = new NGramModel();
+			nGramModel.add(tokens, 2, 2);
+			for (StringList ngram : nGramModel) {
+				Dictionary.get(ngram.getToken(0)).add(ngram.getToken(1));
 			}
 		}
 		return Dictionary;
@@ -69,7 +61,7 @@ public class ModelGenerator {
 	public static Map<String, Object> probabilities(Map<String, List<String>> Dict) {
 		Iterator<Map.Entry<String, List<String>>> itr = Dict.entrySet().iterator();
 		while (itr.hasNext()) {
-			Map<String,Object> tempDict = new HashMap<String, Object>();
+			Map<String, Object> tempDict = new HashMap<String, Object>();
 			LinkedHashMap<String, Double> ProbabilitiesDict = new LinkedHashMap<String, Double>();
 			Entry<String, List<String>> entry = itr.next();
 			List<String> NextWords = entry.getValue();
@@ -103,7 +95,7 @@ public class ModelGenerator {
 		Map<String, List<String>> bigramDict = new HashMap<String, List<String>>();
 		Map<String, List<String>> trigramDict = new HashMap<String, List<String>>();
 		Map<String, Object> globalMap = new HashMap<String, Object>();
-		ArrayList<String[]> arr = new ArrayList<String[]>();
+		ArrayList<String> arr = new ArrayList<String>();
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			globalMap = mapper.readValue(new File(jsonFilePath + "Model.json"),
@@ -124,14 +116,15 @@ public class ModelGenerator {
 			String sCurrentLine;
 
 			while ((sCurrentLine = br.readLine()) != null) {
-				arr.add(sCurrentLine.toLowerCase().split(" +"));
-
+				if (!sCurrentLine.equals(""))
+					arr.add(sCurrentLine.toLowerCase().trim());
 			}
+
 			bigramDict = bigram_model(arr);
 			trigramDict = trigram_model(arr);
 			probabilities(bigramDict);
 			probabilities(trigramDict);
-			final_dict =  GlobalUpdation.GlobalUpdator(globalMap, final_dict); 
+			final_dict = GlobalUpdation.GlobalUpdator(globalMap, final_dict);
 
 			mapper.writeValue(new File(jsonFilePath + "Model.json"), final_dict);
 		} catch (IOException e) {
@@ -142,9 +135,8 @@ public class ModelGenerator {
 	public static void main(String[] args) {
 		String textFilePath = args[0];
 		String jsonFilePath = args[1];
-//		String textFilePath = "/home/anup/SakhaGlobal/Next_word_prediction/Random/Next_Word_Predictor/input1.txt";
-//		String jsonFilePath = "/home/anup/SakhaGlobal/S20/global/";
+//		String textFilePath = "/home/anup/Downloads/train1.txt";
+//		String jsonFilePath = "/home/anup/Desktop/";
 		model_generator(textFilePath, jsonFilePath);
-//		bigram_generator(textFilePath,jsonFilePath);
 	}
 }
