@@ -47,7 +47,6 @@ public class ModelGenerator {
 	public static Map<String, List<String>> bigram_model(ArrayList<String> arr) {
 		Map<String, List<String>> Dictionary = new DefaultDict<String, List<String>>(ArrayList.class);
 		for (String sentence : arr) {
-			System.out.println(sentence);
 			StringList tokens = new StringList(WhitespaceTokenizer.INSTANCE.tokenize(sentence));
 			NGramModel nGramModel = new NGramModel();
 			nGramModel.add(tokens, 2, 2);
@@ -133,10 +132,10 @@ public class ModelGenerator {
 	}
 
 	public static void main(String[] args) {
-		String textFilePath = args[0];
-		String jsonFilePath = args[1];
-//		String textFilePath = "/home/anup/Downloads/train1.txt";
-//		String jsonFilePath = "/home/anup/Desktop/";
+//		String textFilePath = args[0];
+//		String jsonFilePath = args[1];
+		String textFilePath = "/home/anup/Downloads/train1.txt";
+		String jsonFilePath = "/home/anup/Desktop/";
 		model_generator(textFilePath, jsonFilePath);
 	}
 }
