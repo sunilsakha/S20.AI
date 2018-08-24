@@ -125,17 +125,17 @@ public class ModelGenerator {
 			probabilities(trigramDict);
 			final_dict = GlobalUpdation.GlobalUpdator(globalMap, final_dict);
 
-			mapper.writeValue(new File(jsonFilePath + "Model.json"), final_dict);
+			mapper.writeValue(new File(jsonFilePath + "Hindi.json"), final_dict);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
 	public static void main(String[] args) {
-//		String textFilePath = args[0];
-//		String jsonFilePath = args[1];
-		String textFilePath = "/home/anup/Downloads/train1.txt";
-		String jsonFilePath = "/home/anup/Desktop/";
+		String textFilePath = args[0];
+		String jsonFilePath = args[1];
+//		String textFilePath = "/home/anup/Downloads/hindi_train.txt";
+//		String jsonFilePath = "/home/anup/Desktop/";
 		model_generator(textFilePath, jsonFilePath);
 	}
 }
